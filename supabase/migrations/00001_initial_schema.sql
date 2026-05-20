@@ -48,7 +48,7 @@ create table users (
   name            text not null,
   department_id   bigint not null references departments(id),
   designation     text,
-  reporting_to_id uuid references users(id) on delete set null,
+  reporting_to_id uuid references users(id) on delete set null on update cascade,
   role            user_role not null default 'member',
   standard_hours  numeric(4,1) not null default 8.0,
   default_billable boolean not null default true,
@@ -63,12 +63,12 @@ create index idx_users_mgr on users(reporting_to_id);
 create index idx_users_role on users(role);
 
 alter table departments
-  add constraint fk_dept_lead foreign key (lead_user_id) references users(id) on delete set null;
+  add constraint fk_dept_lead foreign key (lead_user_id) references users(id) on delete set null on update cascade;
 
 create table allow_list (
   id          bigint generated always as identity primary key,
   email       text not null unique,
-  invited_by  uuid references users(id) on delete set null,
+  invited_by  uuid references users(id) on delete set null on update cascade,
   invited_at  timestamptz not null default now(),
   expires_at  timestamptz,
   consumed_at timestamptz
@@ -117,7 +117,7 @@ create table user_skills (
   skill_id        bigint not null references skills(id) on delete cascade,
   proficiency     proficiency not null,
   last_used_date  date,
-  tagged_by       uuid   references users(id) on delete set null,
+  tagged_by       uuid   references users(id) on delete set null on update cascade,
   tagged_at       timestamptz not null default now(),
   unique (user_id, skill_id)
 );
@@ -133,7 +133,7 @@ create table project_skills (
 
 create table daily_logs (
   id              bigint generated always as identity primary key,
-  user_id         uuid not null references users(id) on delete cascade,
+  user_id         uuid not null references users(id) on delete cascade on update cascade,
   log_date        date not null,
   status          log_status not null,
   project_id      bigint references projects(id) on delete set null,
@@ -146,7 +146,7 @@ create table daily_logs (
   billable        boolean,
   blocker         text,
   next_action     text,
-  assigned_by     uuid references users(id) on delete set null,
+  assigned_by     uuid references users(id) on delete set null on update cascade,
   remarks         text,
   late_entry      boolean not null default false,
   source          text not null default 'web',
@@ -171,7 +171,7 @@ create index idx_bl_open on blockers(resolved_on, opened_on);
 
 create table audit_log (
   id            bigint generated always as identity primary key,
-  actor_user_id uuid references users(id) on delete set null,
+  actor_user_id uuid references users(id) on delete set null on update cascade,
   action        text not null,
   entity        text not null,
   entity_id     text,
