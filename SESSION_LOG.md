@@ -7,6 +7,40 @@ Newest entries first.
 
 ## Session 2 — 20 May 2026 — Scaffold build
 
+**Mid-session update — FK constraint bug:**
+- Migration 00002 failed on final retroactive-link UPDATE: foreign key constraint blocked changing Jayesh's placeholder id (other users' reporting_to_id pointed at it).
+- Root cause: my schema 00001 didn't add `on update cascade` to FKs referencing users(id).
+- Fix: created `00003_fk_cascade_update.sql` to ALTER all 9 FKs that reference users.id to add `on update cascade`, then re-runs the retroactive link.
+- Lesson for future scaffolds: when using mutable IDs (like linking external auth to local rows), FKs MUST be ON UPDATE CASCADE.
+
+
+**Mid-session update — employee name corrections:**
+- Chirag (Mobile manager) → "Chirag Ramani" (full name)
+- Divya (Frontend) → "Divya Rojivadiya" (email: divya.r@binaryic.in to disambiguate)
+- Added Divya Wakode (Digital Marketing) — was missed in original Google Sheet extraction
+- "Tejas Korat" capitalization confirmed correct
+- Seed user count now 72 (was 71). Total DB user count = 73 including Jayesh.
+
+
+**Mid-session update — bulk user seed + auto-link trigger:**
+- Generated `supabase/migrations/00002_seed_users.sql` — imports 70 employees with role assignments + sets reporting_to_id + dept lead pointers.
+- Role assignments confirmed by Jayesh:
+  - admin: Jayesh, Priyanka (HR Manager — backup admin)
+  - leadership: Sneha (Head Digital — sees whole org), Meenakshi (Ecommerce Success Manager)
+  - hr: Manthan, Prachi
+  - manager: Harish (PM), Madhav (Frontend), Aarti (Backend), Chirag (Mobile), Neha (QA), Shivam (Catalog), Sandeep (UI/UX), Nagesh (Accounts)
+  - member: remaining ~56 people
+- Added `on_auth_user_created` trigger in auth.users schema: on signup, auto-links auth.users.id → public.users.id by matching email. Future signups need no manual SQL.
+- Retroactive link statement included: existing auth users (Jayesh) get linked automatically when migration runs.
+- Email convention: firstname@binaryic.in. Two ambiguous cases — chirag.s@binaryic.in (Chirag Sankaliya, since Chirag the manager has chirag@binaryic.in). Verify with HR before rollout.
+
+
+**Mid-session update — Netlify build fix:**
+- First Netlify build failed: ESLint 9.x conflicts with eslint-config-next@14.2.15 (which expects ESLint 7 or 8).
+- Fixed in `package.json`: changed `"eslint": "^9.12.0"` to `"eslint": "^8.57.0"`.
+- Lesson for future scaffolds: pin eslint to v8 until Next.js's eslint-config catches up to v9.
+
+
 **Mid-session update — auth method pivoted:**
 - Discovered Binary uses Zoho Mail (not Google Workspace) for @binaryic.in addresses.
 - Replaced Google OAuth flow with email + password (Jayesh's preference over magic link).

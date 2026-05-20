@@ -99,3 +99,16 @@ When any of these get answered, update `DECISIONS.md`.
 ---
 
 *This file is the source of truth for project state. Keep it accurate.*
+
+
+## Current deployment state (as of 20 May 2026)
+
+- Code: github.com/jaybinary/binarypulse (live, all files except .gitignore — see SESSION_LOG)
+- Database: Supabase Mumbai region, schema applied. 11 departments + 44 skills seeded. **User seed pending** (00002_seed_users.sql ready, awaiting Jayesh to run).
+- Hosting: Netlify, building from main branch. Temporary `*.netlify.app` URL working. Custom domain `binarypulse.live` pending connection.
+- Auth: email + password. Jayesh manually linked + signed up. Other users will use the auto-link trigger added in migration 00002.
+- Pending immediate steps:
+  1. Run `00002_seed_users.sql` in Supabase
+  2. Connect `binarypulse.live` to the Netlify site
+  3. Add custom domain to Supabase redirect URLs
+  4. Test signup as a second user (e.g., create temp test@binaryic.in to verify the trigger works)

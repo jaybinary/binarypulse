@@ -81,3 +81,20 @@ When any of these get decided, move the line up to a new ADR with date.
 - Magic Link (passwordless): rejected by Jayesh in favour of familiar password UX.
 - Zoho SSO (SAML): requires Supabase Pro tier, overkill for v1.
 **Implication:** Removes Google Cloud Console dependency entirely. Signup, login, forgot-password, reset-password pages built. Email templates default to Supabase sender until Resend SMTP is configured (planned for v1.5).
+
+## ADR-010 — 20 May 2026 — Role assignment model: invite-based pre-creation
+**Status:** Active
+**Decision:** Admin pre-creates each employee's row in `public.users` (email, name, role, department, designation, manager). A trigger on `auth.users` auto-links the auth.users.id to the pre-existing row on signup.
+**Why:** Binary's 71 employees are known. Pre-assignment gives correct roles from day 1, prevents privilege escalation (no one can self-assign as admin), and avoids a "pending approval" queue for the admin to babysit.
+**Alternative considered:** Open signup with admin-approved role assignment afterwards. Rejected as more babysitting and slower onboarding.
+**Implication:** Onboarding a new joiner = admin adds one row to `users`, then employee signs up using the email. Trigger does the rest.
+
+## ADR-011 — 20 May 2026 — Role assignments for current 71-person org
+**Status:** Active (revisit when org structure changes)
+**Decision:** Initial role distribution:
+- admin (2): Jayesh, Priyanka Patel
+- leadership (2): Sneha Lakhani, Meenakshi Lakhani
+- hr (2): Manthan Sagalia, Prachi Rupani
+- manager (8): Harish, Sandeep, Madhav, Aarti, Chirag, Neha, Shivam, Nagesh
+- member (~57): everyone else
+**Why:** Matches actual reporting structure at Binary today. Sneha gets leadership (not manager) because she advises across Marketing + Digital Marketing.
